@@ -1,0 +1,56 @@
+{% extends 'todo/base.html' %}
+
+{% block title %}TODO List{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8 mx-auto">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="mb-0">My TODOs</h3>
+            </div>
+            <div class="card-body">
+                <form method="post" action="{% url 'create_todo' %}" class="mb-4">
+                    {% csrf_token %}
+                    <div class="row g-2">
+                        <div class="col-md-8">
+                            {{ form.title }}
+                        </div>
+                        <div class="col-md-4">
+                            <button type="submit" class="btn btn-primary w-100">Add TODO</button>
+                        </div>
+                    </div>
+                </form>
+
+                {% if todos %}
+                    <div class="list-group">
+                        {% for todo in todos %}
+                            <div class="todo-item {% if todo.completed %}completed{% endif %}">
+                                <form method="post" action="{% url 'toggle_todo' todo.pk %}" style="margin: 0;">
+                                    {% csrf_token %}
+                                    <input type="checkbox" {% if todo.completed %}checked{% endif %} onchange="this.form.submit()" style="cursor: pointer; width: 20px; height: 20px;">
+                                </form>
+                                <div class="ms-3 flex-grow-1">
+                                    <h5 class="todo-title">{{ todo.title }}</h5>
+                                    {% if todo.description %}
+                                        <p class="text-muted small mb-0">{{ todo.description }}</p>
+                                    {% endif %}
+                                    {% if todo.due_date %}
+                                        <small class="due-date">Due: {{ todo.due_date|date:"M d, Y H:i" }}</small>
+                                    {% endif %}
+                                </div>
+                                <a href="{% url 'edit_todo' todo.pk %}" class="btn btn-sm btn-warning btn-small">Edit</a>
+                                <a href="{% url 'delete_todo' todo.pk %}" class="btn btn-sm btn-danger btn-small">Delete</a>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="alert alert-info text-center">
+                        No TODOs yet. Create one to get started!
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
